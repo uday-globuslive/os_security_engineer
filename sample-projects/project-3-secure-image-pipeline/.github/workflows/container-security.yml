@@ -1,0 +1,53 @@
+name: container-security
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
+jobs:
+  build-scan-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Image
+        run: docker build -t local/app:${{ github.sha }} .
+
+      - name: Trivy Scan (fail on critical)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: local/app:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL
+
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0.17.5
+
+      - name: Generate SBOM
+        run: syft packages local/app:${{ github.sha }} -o cyclonedx-json > sbom.cdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cdx.json
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Sign Image (optional demo)
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          echo "Skipping actual signing unless registry push and OIDC setup are configured."

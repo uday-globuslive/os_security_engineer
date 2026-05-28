@@ -1,0 +1,32 @@
+
+Job Title:  Senior OS Security Engineer – CVE Remediation & Image Hardening
+Location: Remote
+What You’ll Do
+Own end-to-end CVE remediation across Linux-based container images
+Analyze vulnerabilities across OS packages, libraries, and dependencies
+Patch, rebuild, and validate hardened container images
+Reduce attack surface by removing unnecessary packages and components
+Build and scale automated pipelines for continuous patching and image rebuilding
+Generate and maintain SBOMs and ensure supply chain integrity
+Partner with platform and security teams to integrate into CI/CD workflows
+Continuously improve image performance, size, and security posture
+What You Bring
+5+ years in Linux systems, security, or platform engineering
+Deep understanding of Linux distributions (Debian, Alpine, RHEL, etc.)
+Strong experience with containers and orchestration (Docker, Kubernetes)
+Hands-on experience remediating CVEs (not just scanning)
+Familiarity with vulnerability tools (Grype, Trivy)
+Experience with package managers (apt, yum, apk)
+Strong scripting or programming skills (Python, Bash, or Go)
+Solid understanding of container image layering and optimization
+Nice to Have
+Experience building minimal/distroless images
+Familiarity with SBOM tools and formats (SPDX, CycloneDX)
+Experience with signing and provenance (cosign, sigstore)
+Knowledge of supply chain security frameworks (SLSA)
+Background in security or high-scale SaaS environments
+What Success Looks Like
+Deliver container images with near-zero CVEs
+Build scalable, automated remediation pipelines
+Significantly reduce image size and attack surface
+Enable customers to deploy secure containers without friction

@@ -1,0 +1,17 @@
+Tell me about a critical CVE you personally remediated in a production container image. What exactly did you change?
+How would you reduce the attack surface of a container image?
+A vulnerability scanner reports HIGH CVEs even after patching the image. Why does this happen?
+
+
+I replied as below:
+
+Tell me about a critical CVE you personally remediated in a production container image. What exactly did you change?
+
+In one of our AKS workloads, Trivy reported a critical OpenSSL CVE in the base Ubuntu image used by a Java microservice. I first verified the Trivy report and checked the actual OpenSSL version inside a throwaway container to confirm the issue. To fix it, I updated the Dockerfile to use the latest patched Ubuntu 20.04 base image and added apt-get update && apt-get dist-upgrade -y during the build, followed by cleaning up apt caches. I also switched the container to run as a non‑root user and removed unnecessary tools from the final image to reduce the attack surface. After rebuilding and pushing the image to ACR, I re‑ran Trivy in the pipeline and confirmed that the critical CVE was no longer reported before rolling it out to AKS.
+
+How would you reduce the attack surface of a container image?
+
+My approach is to keep images minimal and follow least privilege. I start with small, well maintained base images (for example, slim or distroless variants) and make sure they are regularly updated. I use multi‑stage builds so compilers and build tools stay only in the build stage, and the runtime image contains just the app and its runtime dependencies. I run the container as a non‑root user, expose only the required ports, and avoid adding utilities like SSH, ping, or editors unless they are strictly needed. Finally, I integrate Trivy and other scans into CI so vulnerable or bloated images are caught before they reach the registry or AKS.
+
+A vulnerability scanner reports HIGH CVEs even after patching the image. Why does this happen?
+In my experience, HIGH CVEs still showing up usually come down to a few reasons. One common case is that the base image tag itself is still vulnerable, so even if you rebuild the app layer, the OS libraries remain old. Another reason is that the vulnerable package still exists in the image, even if the application doesn’t actually use it. Scanners work off the packages present on disk, so they will continue to flag that CVE until you upgrade or remove that package.There can also be lag between when a vendor fixes something, when the base image is updated, and when the scanner’s vulnerability database is refreshed, which can make reports look wrong for a while. And in Kubernetes, sometimes the app image is fixed but sidecars or node images still carry the same vulnerability, so your overall scan still shows HIGH findings.
